@@ -69,6 +69,10 @@ def remove_stopwords(tokenized_ls):
                 tmp.append(word)
         removed_stopwords.append(tmp)
     return removed_stopwords
+
+
+def remove_space_special(content_arr):
+    return list(filter(lambda x: x not in " (){}!,'`<>=@_:;,\'\"\\”“‘’", np.array(content_arr)))
 ##############################
 
 #! all steps preprocess
@@ -88,8 +92,9 @@ def preprocess_text(text):
     text = basic_cleaner(text)
 
     tokenized_text = word_tokenize(text, engine='deepcut')
+    tokenized_text = remove_space_special(tokenized_text)
 
-    removed_stopwords_text = remove_stopwords(text)
+    removed_stopwords_text = remove_stopwords(tokenized_text)
 
     return tokenized_text, removed_stopwords_text
 
