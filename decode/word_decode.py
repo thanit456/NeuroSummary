@@ -52,7 +52,7 @@ def predict_sequence(infenc, infdec, source, n_steps, removed_stopwords=False):
     return decoded_sentence
 
 
-def inference(dataset, inf_enc, inf_dec):
+def inference(dataset, inf_enc, inf_dec, removed_stopwords=False):
 
     dict_t, rev_dict_t, vocab_size = create_dictionary()
 
@@ -64,6 +64,6 @@ def inference(dataset, inf_enc, inf_dec):
     pred_sum = []
     for c in dataset:
         pred = predict_sequence(inf_enc, inf_dec, pad_sequences(
-            [c], maxlen=maxlen, padding='post'), steps, num_decoder_tokens=vocab_size)
+            [c], maxlen=maxlen, padding='post'), steps, removed_stopwords=removed_stopwords)
         pred_sum.append(pred.strip())
     return pred_sum

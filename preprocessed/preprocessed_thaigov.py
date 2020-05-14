@@ -1,34 +1,21 @@
-import tensorflow as tf
-from tensorflow.keras.preprocessing.sequence import pad_sequences
-from tensorflow.keras.layers import Bidirectional, Concatenate, Permute, Dot, Input, LSTM, Multiply
-from tensorflow.keras.layers import RepeatVector, Dense, Activation, Lambda
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.models import load_model, Model
-import tensorflow.keras.backend as K
+from pythainlp.tokenize import word_tokenize
+from pythainlp.util import thai_digit_to_arabic_digit
+from pythainlp.corpus.common import thai_stopwords
 
 import numpy as np
 import re
-import matplotlib.pyplot as plt
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from tqdm import tqdm_notebook
 import copy
+import sys
+
+sys.path.append('../config/hparams.py')
+
 
 #from pythainlp.ulmfit import ThaiTokenizer
-from pythainlp.corpus.common import thai_stopwords
-from pythainlp.util import thai_digit_to_arabic_digit
-from pythainlp.tokenize import word_tokenize
 
-df = pd.read_csv(
-    '/content/drive/Shared drives/NeuroSummary/data/1_24_thaigov.csv')
-
-df = df.rename(columns={'content': 'raw_content'})
-df.head()
 
 ### PREPROCESS EACH STEP ###
 
-
+# ? Not sure that Should this function use?
 def extract_most_specific_headline(text):
     text = text[text.find('-') + 1:]
     return text[text.find('-') + 1:]
@@ -57,24 +44,26 @@ def strip_each_word(tokens):
         ls.append(token.strip())
     return ls
 
-# remove stopwords
-
 
 def remove_stopwords(tokenized_ls):
     removed_stopwords = []
-    for text in tqdm_notebook(tokenized_ls):
+    for text in tokenized_ls:
         tmp = []
         for word in text:
             if word not in thai_stopwords():
                 tmp.append(word)
         removed_stopwords.append(tmp)
     return removed_stopwords
+
+
+def use_first_n_words(tokenized_ls, n):
+    return tokenized_ls[:n]
 ##############################
 
 #! all steps preprocess
 
 
-def preprocess_text(text):
+def preprocess_text(text, removed_stopwords=False):
     '''
     Preprocess all steps above 
     Input: news content (String)
@@ -83,15 +72,18 @@ def preprocess_text(text):
             preprocessed tokenized news content removed stopwords (list) 
             )
     '''
+    hparams = hparams.create_hparams()
+
     text = remove_date(text)
     text = thai_digit_to_arabic_digit(text)
     text = basic_cleaner(text)
 
     tokenized_text = word_tokenize(text, engine='deepcut')
-
-    removed_stopwords_text = remove_stopwords(text)
-
-    return tokenized_text, removed_stopwords_text
+    tokenized_text = use_first_n_words(tokenized_text, n=hparams.maxlen)
+    if remove_stopwords:
+        removed_stopwords_text = remove_stopwords(tokenized_text)
+        return remove_stopwords
+    return tokenized_text
 
 ##### remove the first headline of this news #####
 # # remove redundant sentence
