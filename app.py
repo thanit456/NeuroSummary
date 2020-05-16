@@ -1,6 +1,7 @@
 from flask import abort, request, Flask, jsonify
 from keras import models
 import argparse
+import tensorflow as tf
 
 from preprocessed.preprocessed_thaigov import preprocess_text, convert
 from decode.word_decode import inference
@@ -28,6 +29,10 @@ else:
     args.infenc_path = MODEL_WO_STOPWORDS_INFENC_PATH
     args.infdec_path = MODEL_WO_STOPWORDS_INFDEC_PATH
 
+infenc = models.load_model(args.infenc_path)
+infdec = models.load_model(args.infdec_path)
+graph = tf.get_default_graph()
+
 app = Flask(__name__)
 
 
@@ -48,12 +53,12 @@ def infer():
     preprocessed_text = preprocess_text(request.json['content'])
     index_seq = convert(preprocessed_text)
 
-    infenc = models.load_model(args.infenc_path)
-    infdec = models.load_model(args.infdec_path)
+    global graph
+    with graph.as_default():
+        inferred_headline = inference([index_seq], infenc, infdec, hparams['removed_stopwords'])
 
-    inferred_headline = inference([index_seq], infenc, infdec, hparams['removed_stopwords'])
     return jsonify({'inferred_headline': inferred_headline}), 201
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, threaded=False)
