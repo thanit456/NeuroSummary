@@ -6,6 +6,6 @@ def create_hparams():
     hparams = {
         "maxlen": 50,
         "maxlen_output": 20,
-        "removed_stopwords": False  
+        "removed_stopwords": False,
     }
     return hparams

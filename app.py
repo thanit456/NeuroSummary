@@ -2,7 +2,8 @@ from flask import abort, request, Flask, jsonify
 from keras import models
 import argparse
 
-from preprocessed.preprocessed_thaigov import preprocess_text, convert
+from preprocessed.utils import word_to_index
+from preprocessed import preprocess_text
 from decode.word_decode import inference
 from config.hparams import create_hparams
 
@@ -34,24 +35,37 @@ app = Flask(__name__)
 #! Just test not for fully used
 @app.route('/preprocess', methods=['POST'])
 def preprocess():
+
     if not request.json or not 'content' in request.json:
         abort(400)
-    preprocessed_text = preprocess_text(request.json['content'])
+
+    content = request.json['content']
+    dataset = request.json['dataset']
+
+    preprocessed_text = preprocess_text(content, dataset)
+
     return jsonify({'preprocessed_text': preprocessed_text}), 201
 
 
 # fully inference headline generation with word-based
 @app.route('/inference', methods=['POST'])
 def infer():
+
     if not request.json or not 'content' in request.json:
         abort(400)
-    preprocessed_text = preprocess_text(request.json['content'])
-    index_seq = convert(preprocessed_text)
+
+    content = request.json['content']
+    dataset = request.json['dataset']
+
+    preprocessed_text = preprocess_text(content, dataset)
+
+    index_seq = word_to_index(preprocessed_text)
 
     infenc = models.load_model(args.infenc_path)
     infdec = models.load_model(args.infdec_path)
 
-    inferred_headline = inference([index_seq], infenc, infdec, hparams['removed_stopwords'])
+    inferred_headline = inference(
+        [index_seq], infenc, infdec, hparams['removed_stopwords'])
     return jsonify({'inferred_headline': inferred_headline}), 201
 
 
