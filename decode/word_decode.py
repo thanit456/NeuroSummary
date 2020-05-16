@@ -3,21 +3,22 @@ import numpy as np
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 import sys
+import os
 
 #! may be use absolute path
-sys.path.append('../config/hparams.py')
+from config.hparams import create_hparams
 
 
 def create_dictionary(removed_stopwords=False):
     if not removed_stopwords:
-        with open('./dictionary/dict.pkl', 'rb') as f:
+        with open('./decode/dictionary/dict.pkl', 'rb') as f:
             dict_t = pickle.load(f)
-        with open('./dictionary/rev_dict.pkl', 'rb') as f:
+        with open('./decode/dictionary/rev_dict.pkl', 'rb') as f:
             rev_dict_t = pickle.load(f)
     else:
-        with open('./dictionary/stop_dict.pkl', 'rb') as f:
+        with open('./decode/dictionary/stop_dict.pkl', 'rb') as f:
             dict_t = pickle.load(f)
-        with open('./dictionary/stop_rev_dict.pkl', 'rb') as f:
+        with open('./decode/dictionary/stop_rev_dict.pkl', 'rb') as f:
             rev_dict_t = pickle.load(f)
     return dict_t, rev_dict_t, len(dict_t)
 
@@ -57,13 +58,11 @@ def inference(dataset, inf_enc, inf_dec, removed_stopwords=False):
     dict_t, rev_dict_t, vocab_size = create_dictionary()
 
     #! Be able to change if it doesn't work
-    hparams = hparams.create_hparams()
-    steps = hparams.maxlen_output
-    maxlen = hparams.maxlen
+    hparams = create_hparams()
+    steps = hparams['maxlen_output']
+    maxlen = hparams['maxlen']
 
-    pred_sum = []
-    for c in dataset:
-        pred = predict_sequence(inf_enc, inf_dec, pad_sequences(
-            [c], maxlen=maxlen, padding='post'), steps, removed_stopwords=removed_stopwords)
-        pred_sum.append(pred.strip())
-    return pred_sum
+    pred = predict_sequence(inf_enc, inf_dec, pad_sequences(
+        dataset, maxlen=maxlen, padding='post'), steps, removed_stopwords=removed_stopwords)
+
+    return pred.strip()

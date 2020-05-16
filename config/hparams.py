@@ -3,8 +3,9 @@ from tensorflow.keras.models import load_model
 
 
 def create_hparams():
-    hparams = tf.contrib.training.HParams(
-        maxlen=50,
-        maxlen_output=20
-    )
+    hparams = {
+        "maxlen": 50,
+        "maxlen_output": 20,
+        "removed_stopwords": False  
+    }
     return hparams
