@@ -53,11 +53,11 @@ def preprocess():
 def infer():
     if not request.json or not 'content' in request.json:
         abort(400)
-    preprocessed_text = preprocess_text(request.json['content'])
-    index_seq = convert(preprocessed_text)
-
+    
     global graph
     with graph.as_default():
+        preprocessed_text = preprocess_text(request.json['content'])
+        index_seq = convert(preprocessed_text)
         inferred_headline = inference([index_seq], infenc, infdec, hparams['removed_stopwords'])
 
     return jsonify({'inferred_headline': inferred_headline}), 201
