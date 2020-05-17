@@ -1,21 +1,21 @@
 from flask import abort, request, Flask, jsonify
 
-from preprocessed import preprocess_text
+from preprocessed.preprocessed_thaigov import preprocess_thaigov_text
 from decode.word_decode import inference
 from config.hparams import create_hparams
 
 from services.thaigov_inferencer import ThaigovInferencer
 from services.bart_inferencer import BartInferencer
-from services.t5_inferencer import T5Inferencer
-from services.gpt2_inferencer import GPT2Inferencer
+# from services.t5_inferencer import T5Inferencer
+# from services.gpt2_inferencer import GPT2Inferencer
 
 import tensorflow as tf
 
 inferencers = {
     'thaigov': ThaigovInferencer(),
     'bart': BartInferencer(),
-    't5': T5Inferencer(),
-    'gpt2': GPT2Inferencer
+    # 't5': T5Inferencer(),
+    # 'gpt2': GPT2Inferencer
 }
 
 hparams = create_hparams()
@@ -37,7 +37,8 @@ def preprocess():
 
     content = request.json['content']
 
-    preprocessed_text = preprocess_text(content, hparams['removed_stopwords'])
+    preprocessed_text = preprocess_thaigov_text(
+        content, hparams['removed_stopwords'])
 
     return jsonify({'preprocessed_text': preprocessed_text}), 201
 
