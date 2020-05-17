@@ -35,6 +35,9 @@ graph = tf.get_default_graph()
 
 app = Flask(__name__)
 
+@app.route('/', methods=['GET'])
+def hello():
+    return 'It works!', 200
 
 #! Just test not for fully used
 @app.route('/preprocess', methods=['POST'])
@@ -61,4 +64,4 @@ def infer():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, threaded=False)
+    app.run(debug=True, threaded=True, host='0.0.0.0')
