@@ -1,7 +1,6 @@
 from pythainlp.tokenize import word_tokenize
 
-
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+from keras.preprocessing.sequence import pad_sequences
 
 import numpy as np
 import re

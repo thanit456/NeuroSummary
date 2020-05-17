@@ -1,0 +1,8 @@
+tensorflow==1.14
+keras==2.2.5
+flask==1.1.2
+pythainlp==2.1.4
+deepcut==0.6.1
+googletrans==2.4.0
+transformers==2.8.0
+tokenizers==0.7.0
