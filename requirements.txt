@@ -1,0 +1,5 @@
+tensorflow==1.14
+keras==2.2.5
+flask==1.1.2
+pythainlp==2.1.4
+deepcut==0.6.1
