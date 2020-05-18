@@ -12,6 +12,9 @@ class TfIdfInferencer(Inferencer):
     def __init__(self):
         super().__init__()
 
+    def get_name(self):
+        return 'TF-IDF'
+
     def infer(self, content):
         preprocessed_text = preprocess_text(
             content, hparams['removed_stopwords'])
@@ -20,5 +23,4 @@ class TfIdfInferencer(Inferencer):
         tf = {}
         idf = {}
 
-
-        return inferred_headline
+        return content

@@ -26,6 +26,9 @@ class ThaigovInferencer(Inferencer):
         self.infenc = models.load_model(infenc_path)
         self.infdec = models.load_model(infdec_path)
 
+    def get_name(self):
+        return 'Thaigov'
+
     def infer(self, content):
         preprocessed_text = preprocess_text(content)
         index_seq = convert(preprocessed_text)

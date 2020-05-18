@@ -8,3 +8,7 @@ class Inferencer(ABC):
     @abstractmethod
     def infer(self, content):
         raise NotImplementedError
+
+    @abstractmethod
+    def get_name(self):
+        return 'Untitled'

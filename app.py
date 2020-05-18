@@ -1,18 +1,21 @@
-from flask import abort, request, Flask, jsonify
+from flask import abort, request, Flask, jsonify, render_template
 from services.thaigov_inferencer import ThaigovInferencer
+from services.tfidf_inferencer import TfIdfInferencer
 import tensorflow as tf
 
 inferencers = {
-    'thaigov': ThaigovInferencer()
+    'thaigov': ThaigovInferencer(),
+    'tfidf': TfIdfInferencer()
 }
 
 graph = tf.get_default_graph()
+model_options = list(map(lambda model: (model, inferencers[model].get_name()) , inferencers))
 
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def hello():
-    return 'It works!', 200
+    return render_template('index.html', options=model_options)
 
 #! Just test not for fully used
 @app.route('/preprocess', methods=['POST'])
